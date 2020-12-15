@@ -1,0 +1,12 @@
+[Plugin]
+Description=Provides LSP support for swift
+Loader=python3
+Module=swiftbuilder
+Name=Swift Language Server Plugin
+Hidden=false
+X-Builder-ABI=3.32
+X-Completion-Provider-Languages=swift
+X-Hover-Provider-Languages=swift
+X-Symbol-Resolver-Languages=swift
+X-Project-File-Filter-Name=Swift (Package.swift)
+X-Project-File-Filter-Pattern=Package.swift
