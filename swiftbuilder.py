@@ -103,9 +103,6 @@ class SwiftCompletionProvider(Ide.LspCompletionProvider, Ide.CompletionProvider)
 	def do_load(self, context):
 		SwiftService.bind_client(self)
 
-	def do_get_priority(self, context):
-		return 100
-
 class SwiftHoverProvider(Ide.LspHoverProvider):
 	def do_prepare(self):
 		self.props.category = 'swift'
@@ -154,8 +151,9 @@ class SwiftPipelineAddin(Ide.Object, Ide.PipelineAddin):
 		runtime = config.get_runtime()
 		srcdir = pipeline.get_srcdir()
 
-		if not runtime.contains_program_in_path('swift'):
-			raise OSError('Swift not found in path')
+		#if not runtime.contains_program_in_path('swift'):
+		#	raise OSError('Swift not found in path')
+
 
 		# Create a launcher to run 'swift build'
 		build_launcher = pipeline.create_launcher()
@@ -189,7 +187,7 @@ class SwiftBuildTarget(Ide.Object, Ide.BuildTarget):
 		return project_file.get_parent().get_path()
 
 	def do_get_argv(self):
-		return ["swift", "run"]
+		return ["run"]
 
 class SwiftBuildTargetProvider(Ide.Object, Ide.BuildTargetProvider):
 	
@@ -202,12 +200,9 @@ class SwiftBuildTargetProvider(Ide.Object, Ide.BuildTargetProvider):
 		build_system = Ide.BuildSystem.from_context(context)
 
 		if type(build_system) != SwiftBuildService:
-			task.return_error(GLib.Error('Not a swift project',
-							domain=GLib.quark_to_string(Gio.io_error_quark()),
-							code=Gio.IOErrorEnum.NOT_SUPPORTED))
+			task.return_error(GLib.Error('Not a swift project', domain=GLib.quark_to_string(Gio.io_error_quark()), code=Gio.IOErrorEnum.NOT_SUPPORTED))
 			return
 
-		print("Correct build system")
 
 		task.targets = [build_system.ensure_child_typed(SwiftBuildTarget)]
 		task.return_boolean(True)
