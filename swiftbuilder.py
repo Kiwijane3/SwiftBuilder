@@ -56,6 +56,11 @@ class SwiftService(Ide.Object):
 			workdir = self.get_context().ref_workdir()
 			launcher.set_cwd(workdir.get_path())
 
+			# This will allows us to run commands in the host environment,
+			launcher.push_argv('/bin/bash')
+			launcher.push_argv('--login')
+			launcher.push_argv('-c')
+
 			launcher.push_argv('sourcekit-lsp')
 
 			# Spawn our peer process and monitor it for
@@ -157,10 +162,16 @@ class SwiftPipelineAddin(Ide.Object, Ide.PipelineAddin):
 
 		# Create a launcher to run 'swift build'
 		build_launcher = pipeline.create_launcher()
+		
 		# run in the source directory
 		build_launcher.set_cwd(srcdir)
-		build_launcher.push_argv('swift')
-		build_launcher.push_argv('build')
+		
+		# we run the build command  using bash in order to run in the host environment, which is necessarily for incremental compilation
+		build_launcher.push_argv('/bin/bash')
+		build_launcher.push_argv('--login')
+		build_launcher.push_argv('-c')
+		
+		build_launcher.push_argv("swift build")
 
 		build_stage = Ide.PipelineStageLauncher.new(context, build_launcher)
 		build_stage.set_name(_("Building Project"))
@@ -184,10 +195,10 @@ class SwiftBuildTarget(Ide.Object, Ide.BuildTarget):
 	def do_get_cwd(self):
 		context = self.get_context()
 		project_file = Ide.BuildSystem.from_context(context).project_file
-		return project_file.get_parent().get_path()
+		return project_file.get_path()
 
 	def do_get_argv(self):
-		return ["run"]
+		return ["/bin/bash", "--login", "-c", "swift run"]
 
 class SwiftBuildTargetProvider(Ide.Object, Ide.BuildTargetProvider):
 	
