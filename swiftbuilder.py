@@ -44,6 +44,7 @@ class SwiftService(Ide.Object):
 
 
 	def _ensure_started(self):
+		print("Starting swift builder")
 		# To avoid starting the process unconditionally at startup, lazily
 		# start it when the first provider tries to bind a client to its
 		# :client property.
@@ -171,7 +172,7 @@ class SwiftPipelineAddin(Ide.Object, Ide.PipelineAddin):
 		build_launcher.push_argv('--login')
 		build_launcher.push_argv('-c')
 		
-		build_launcher.push_argv("swift build")
+		build_launcher.push_argv("swift build --build-tests")
 
 		build_stage = Ide.PipelineStageLauncher.new(context, build_launcher)
 		build_stage.set_name(_("Building Project"))
